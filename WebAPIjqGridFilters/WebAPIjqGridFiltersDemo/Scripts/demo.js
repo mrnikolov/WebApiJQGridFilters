@@ -46,15 +46,24 @@
             defaultSearch: 'ge'
         });
 
-
     $("#employees").jqGrid({
         url: 'api/Employees',
-        datatype: "json",
+        datatype: 'json',
+        jsonReader: {
+            root: "records",
+            page: "pageNumber",
+            total: "totalPages",
+            records: "totalRows",
+            repeatitems: false,
+            cell: "",
+            id: "id",
+            userdata: "total"
+        },
         search: true,
-        colNames: ['id', 'Name', 'Start Date', 'End Date', 'Company Name'],
+        colNames: ['id', 'Name', 'Start Date', 'End Date', 'Company'],
         colModel: [
             {
-                name: 'Id',
+                name: 'ID',
                 index: 'Id',
                 hidden: true,
                 key: true
@@ -68,27 +77,40 @@
                 }
             },
             {
-                name: 'Start Date',
-                index: 'StartDate',
+                name: 'StartDate',
+                index: 'Start Date',
                 width: 300,
                 searchoptions: {
                     sopt: ['cn']
                 }
             },
             {
-                name: 'End Date',
-                index: 'EndDate',
+                name: 'EndDate',
+                index: 'End Date',
                 width: 300,
                 searchoptions: {
                     sopt: ['cn']
                 }
             },
             {
-                name: 'Company Name',
-                index: 'CompanyName',
+                name: 'Company',
+                index: 'Company.Name', // sorting field
+                filterName: 'CompanyID', // filtering field
+                label: 'Company',
                 width: 300,
+                firstsortorder: 'asc',
+                stype: 'select',
                 searchoptions: {
-                    sopt: ['cn']
+                    sopt: ['eq'],
+                    dataUrl: 'api/Companies/GetCompaniesList',
+                    buildSelect: function (data) {
+                        var selectOptionHtml = '<select><option selected="selected" value="">&lt;All&gt;</option>';
+                        data = JSON.parse(data);
+                        $.each(data, function (index, element) {
+                            selectOptionHtml += '<option value="' + element.ID + '"> ' + $.jgrid.htmlEncode(element.Name) + ' </option>';
+                        });
+                        return selectOptionHtml + '</select>';
+                    }
                 }
             }
         ],
@@ -97,7 +119,7 @@
         pager: '#employeesPager',
         sortname: 'Name',
         viewrecords: true,
-        sortorder: "desc",
+        sortorder: "asc",
         caption: "Employees",
     });
 

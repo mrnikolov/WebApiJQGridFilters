@@ -23,6 +23,20 @@ namespace WebAPIjqGridFiltersDemo.Controllers
             return GetCompanies(rows, page, sidx, sord, filters);
         }
 
+        // Get company names to populate Employees grid drop down
+        public JArray GetCompaniesList()
+        {
+            List<Company> listCompanies = Companies.ToList();
+            dynamic result = new JArray(listCompanies.Select(c =>
+                                                                {
+                                                                    dynamic o = new JObject();
+                                                                    o.ID = c.CompanyID;
+                                                                    o.Name = c.Name;
+                                                                    return o;
+                                                                }).ToArray());
+            return result;
+        }
+
         private JObject GetCompanies(int rows, int page, string sidx, string sord, Filter filters)
         {
             IQueryable<Company> items = Companies.SortBy(filters, sidx, sord);
